@@ -17,39 +17,37 @@
 </template>
 
 <script>
-import RewardCard from '@/components/rewards/RewardCard.vue'
-export default {
-  data() {
-    return {
-      title: "Rewards",
-      selected: null,
-      rewards: null,
-      error: null
+  import RewardCard from '@/components/rewards/RewardCard.vue'
+  import { useRewardStore } from '@/stores/reward.js'
+  export default {
+    setup() {
+      const reward_store = useRewardStore()
+      return { reward_store }
+    },
+    data() {
+      return {
+        title: "Rewards",
+        selected: null,
+        rewards: null,
+        error: null
+      }
+    },
+    components: {
+      RewardCard
+    },
+    methods: {
+      selectReward(reward) {
+        this.$router.push(`rewards/${reward.id}`)
+      }
+    },
+    async mounted() {
+      
+      await this.reward_store.fetch()
+      this.rewards = this.reward_store.getRewards
+      
     }
-  },
-  components: {
-    RewardCard
-  },
-  methods: {
-    selectReward(reward) {
-      console.table(reward)
-      this.$router.push(`rewards/${reward.id}`)
-    }
-  },
-  async mounted() {
-    try {
-      this.error = null
-      const response = await this.$axios.get('/rewards');
-      this.rewards = response.data.data
-    } catch(error) {
-      console.log(error)
-      this.error = error.message
-    }
-    
-    
   }
-}
-</script>
+  </script>
 
 <style scoped>
 
