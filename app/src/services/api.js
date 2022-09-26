@@ -3,7 +3,9 @@ import axios from 'axios'
 const axiosInstance = axios.create({
   baseURL: 'http://localhost/api'
 })
-const token = localStorage.getItem('jwt_token');
+
+const JWT_TOKEN_LOCALSTORAGE_KEY = 'jwt_token'
+const token = localStorage.getItem(JWT_TOKEN_LOCALSTORAGE_KEY)
 
 axiosInstance.defaults.headers.common['Accept'] = 'application/json;charset=UTF-8';
 axiosInstance.defaults.headers.common['Content-Type'] = 'application/json;charset=UTF-8';
@@ -18,16 +20,20 @@ export const authAPI = {
       password
     })
     if (response.status == 200) {
-      localStorage.setItem('jwt_token', response.data.access_token)
+      localStorage.setItem(JWT_TOKEN_LOCALSTORAGE_KEY, response.data.access_token)
       return true
     }
     return false
   },
   async me () {
+    const _token = localStorage.getItem(JWT_TOKEN_LOCALSTORAGE_KEY)
+    if (_token) {
+      axiosInstance.defaults.headers.common['Authorization'] = 'Bearer ' + _token
+    }
     const response = await axiosInstance.post('/auth/me')
     if (response.status == 200) {
       return response.data.data
-    } 
+    }
     return {}
   },
   logout () {
